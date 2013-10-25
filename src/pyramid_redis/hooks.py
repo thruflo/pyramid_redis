@@ -54,12 +54,12 @@ class ParseConfig(object):
         config = {
             'host': o.hostname,
             'port': o.port,
-            'db': db
+            'db': int(db)
         }
         if o.password:
             config['password'] = o.password
         if max_connections is not None:
-            config['max_connections'] = max_connections
+            config['max_connections'] = int(max_connections)
         return config
     
 
