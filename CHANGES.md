@@ -1,4 +1,8 @@
 
+# 0.1.2
+
+Explicitly write the `redis.` namespace in the default settings dict keys.
+
 # 0.1.1
 
 Support a `REDIS_KEY` environment variable to make picking up vars from
