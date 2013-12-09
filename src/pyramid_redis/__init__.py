@@ -14,9 +14,9 @@ REDIS_DB = '{0}_DB'.format(stub)
 REDIS_URL = '{0}_URL'.format(stub)
 REDIS_MAX_CONNECTIONS = '{0}_MAX_CONNECTIONS'.format(stub)
 DEFAULT_SETTINGS = {
-    'db': os.environ.get(REDIS_DB, 0),
-    'url': os.environ.get(REDIS_URL, 'redis://localhost:6379'),
-    'max_connections': os.environ.get(REDIS_MAX_CONNECTIONS, None),
+    'redis.db': os.environ.get(REDIS_DB, 0),
+    'redis.url': os.environ.get(REDIS_URL, 'redis://localhost:6379'),
+    'redis.max_connections': os.environ.get(REDIS_MAX_CONNECTIONS, None),
 }
 
 class IncludeMe(object):
@@ -29,7 +29,7 @@ class IncludeMe(object):
     def __call__(self, config):
         settings = config.get_settings()
         for key, value in self.default_settings.items():
-            settings.setdefault('redis.{0}'.format(key), value)
+            settings.setdefault(key, value)
         config.add_request_method(self.get_redis, 'redis', reify=True)
     
 
