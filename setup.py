@@ -14,7 +14,7 @@ def _read(file_name):
 
 setup(
     name = 'pyramid_redis',
-    version = '0.1.2',
+    version = '0.1.3',
     description = 'Integrate redis with a Pyramid application.',
     author = 'James Arthur',
     author_email = 'username: thruflo, domain: gmail.com',
