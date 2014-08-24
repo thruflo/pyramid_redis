@@ -22,7 +22,7 @@ import redis
 
 try:
     import urlparse
-except ImportError: #py3
+except ImportError:  # py3
     import urllib.parse as urlparse
 
 from zope.component import getGlobalSiteManager
@@ -46,7 +46,7 @@ class RedisClientConfiguration(dict):
           a dict to return. As an alternative, you may also provide a
           unix_socket_path.
         """
-	self.clear() # make sure you can reconfigure the client
+        self.clear()  # make sure you can reconfigure the client
         db = settings.get('redis.db', 0)
         config = {'db': int(db)}
 
@@ -66,7 +66,7 @@ class RedisClientConfiguration(dict):
             max_connections = settings.get('redis.max_connections', None)
             if max_connections is not None:
                 config['max_connections'] = int(max_connections)
-            config = {'connection_pool':self.pool_cls(**config)}
+            config = {'connection_pool': self.pool_cls(**config)}
         elif 'redis.unix_socket_path' in settings:
             config['unix_socket_path'] = settings['redis.unix_socket_path']
         else:
@@ -74,7 +74,7 @@ class RedisClientConfiguration(dict):
                 """To use redis with pyramid, redis.url or
                 redis.unix_socket_path should be provided"""
             )
-	self.update(config)
+        self.update(config)
 
 
 class RedisFactory(object):
@@ -86,9 +86,9 @@ class RedisFactory(object):
         self.redis_cls = kwargs.get('redis_cls', redis.StrictRedis)
 
     def __call__(self, settings, registry=None):
-        """Returns a ``redis`` client that uses a client configuration registered in
-          the ``registry`` provided that is, in turn, configured with the
-          ``settings`` provided.
+        """Returns a ``redis`` client that uses a client configuration
+           registered in the ``registry`` provided that is, in turn,
+           configured with the ``settings`` provided.
         """
 
         # If called without a registry, i.e.: not within the context of a
@@ -101,8 +101,8 @@ class RedisFactory(object):
         # instantiate and register one for next time.
         redis_client_conf = registry.queryUtility(IRedisClientConfiguration)
         if not redis_client_conf:
-            self.config(settings) # update RedisClientConf
-	    redis_client_conf = self.config
+            self.config(settings)  # update RedisClientConf
+            redis_client_conf = self.config
             self.provides(self.config, IRedisClientConfiguration)
             registry.registerUtility(self.config,
                                      IRedisClientConfiguration)
