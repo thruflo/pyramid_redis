@@ -31,25 +31,26 @@ from zope.interface import directlyProvides
 
 
 class IRedisClientConfiguration(Interface):
-    """Marker interface provided by RedisConnectionPool utilities or
-    unix_socket_path"""
+    """Marker interface provided by RedisClientConfiguration"""
 
 
-class ParseConfig(object):
+class RedisClientConfiguration(dict):
     """Parse the application settings into connection pool kwargs."""
 
     def __init__(self, **kwargs):
         self.parse_url = kwargs.get('parse_url', urlparse.urlparse)
+        self.pool_cls = kwargs.get('pool_cls', redis.BlockingConnectionPool)
 
     def __call__(self, settings):
         """Unpack the settings. Parse the url into components and build
           a dict to return. As an alternative, you may also provide a
           unix_socket_path.
         """
+	self.clear() # make sure you can reconfigure the client
         db = settings.get('redis.db', 0)
         config = {'db': int(db)}
 
-        if 'redis.url' in settings.keys():
+        if 'redis.url' in settings:
             # Unpack.
             url = settings['redis.url']
 
@@ -65,22 +66,22 @@ class ParseConfig(object):
             max_connections = settings.get('redis.max_connections', None)
             if max_connections is not None:
                 config['max_connections'] = int(max_connections)
-        elif 'redis.unix_socket_path' in settings.keys():
+            config = {'connection_pool':self.pool_cls(**config)}
+        elif 'redis.unix_socket_path' in settings:
             config['unix_socket_path'] = settings['redis.unix_socket_path']
         else:
             raise pyramid.exceptions.ConfigurationError(
                 """To use redis with pyramid, redis.url or
                 redis.unix_socket_path should be provided"""
             )
-        return config
+	self.update(config)
 
 
 class RedisFactory(object):
 
     def __init__(self, **kwargs):
         self.get_registry = kwargs.get('get_registry', getGlobalSiteManager)
-        self.parse_config = kwargs.get('parse_config', ParseConfig())
-        self.pool_cls = kwargs.get('pool_cls', redis.BlockingConnectionPool)
+        self.config = kwargs.get('parse_config', RedisClientConfiguration())
         self.provides = kwargs.get('provides', directlyProvides)
         self.redis_cls = kwargs.get('redis_cls', redis.StrictRedis)
 
@@ -100,20 +101,14 @@ class RedisFactory(object):
         # instantiate and register one for next time.
         redis_client_conf = registry.queryUtility(IRedisClientConfiguration)
         if not redis_client_conf:
-            redis_client_conf = self._create_clientconfig()
-            self.provides(redis_client_conf, IRedisClientConfiguration)
-            registry.registerUtility(redis_client_conf,
+            self.config(settings) # update RedisClientConf
+	    redis_client_conf = self.config
+            self.provides(self.config, IRedisClientConfiguration)
+            registry.registerUtility(self.config,
                                      IRedisClientConfiguration)
 
         # And use it to instantiate a redis client.
         return self.redis_cls(**redis_client_conf)
-
-    def _create_client_config(self, settings):
-        kwargs = self.parse_config(settings)
-        if 'host' in kwargs.keys():
-            return {'connection_pool': self.pool_cls(**kwargs)}
-        else:
-            return kwargs
 
 
 class GetRedisClient(object):
