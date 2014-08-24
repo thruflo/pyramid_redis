@@ -50,7 +50,7 @@ class RedisClientConfiguration(dict):
         db = settings.get('redis.db', 0)
         config = {'db': int(db)}
 
-        if 'redis.url' in settings:
+        if settings['redis.url'] is not None:
             # Unpack.
             url = settings['redis.url']
 
@@ -67,7 +67,7 @@ class RedisClientConfiguration(dict):
             if max_connections is not None:
                 config['max_connections'] = int(max_connections)
             config = {'connection_pool': self.pool_cls(**config)}
-        elif 'redis.unix_socket_path' in settings:
+        elif settings['redis.unix_socket_path'] is not None:
             config['unix_socket_path'] = settings['redis.unix_socket_path']
         else:
             raise pyramid.exceptions.ConfigurationError(
