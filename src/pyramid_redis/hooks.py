@@ -31,10 +31,12 @@ from zope.interface import directlyProvides
 
 
 class IRedisClientConfiguration(Interface):
+
     """Marker interface provided by RedisClientConfiguration"""
 
 
 class RedisClientConfiguration(dict):
+
     """Parse the application settings into connection pool kwargs."""
 
     def __init__(self, **kwargs):
@@ -49,8 +51,12 @@ class RedisClientConfiguration(dict):
         self.clear()  # make sure you can reconfigure the client
         db = settings.get('redis.db', 0)
         config = {'db': int(db)}
-
-        if settings['redis.url'] is not None:
+        if ('redis.unix_socket_path' in settings and
+                settings['redis.unix_socket_path'] is not None):
+            config['unix_socket_path'] = settings['redis.unix_socket_path']
+        elif ('redis.url' in settings and
+                settings['redis.url'] is not None):  # should default to
+                                                     # `redis://localhost:6379`
             # Unpack.
             url = settings['redis.url']
 
@@ -67,8 +73,6 @@ class RedisClientConfiguration(dict):
             if max_connections is not None:
                 config['max_connections'] = int(max_connections)
             config = {'connection_pool': self.pool_cls(**config)}
-        elif settings['redis.unix_socket_path'] is not None:
-            config['unix_socket_path'] = settings['redis.unix_socket_path']
         else:
             raise pyramid.exceptions.ConfigurationError(
                 """To use redis with pyramid, redis.url or
