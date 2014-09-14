@@ -75,6 +75,7 @@ class RedisClientConfiguration(dict):
                 redis.unix_socket_path should be provided"""
             )
         self.update(config)
+        return self
 
 
 class RedisFactory(object):
@@ -101,8 +102,7 @@ class RedisFactory(object):
         # instantiate and register one for next time.
         redis_client_conf = registry.queryUtility(IRedisClientConfiguration)
         if not redis_client_conf:
-            self.config(settings)  # update RedisClientConf
-            redis_client_conf = self.config
+            redis_client_conf = self.config(settings)  # update RedisClientConf
             self.provides(self.config, IRedisClientConfiguration)
             registry.registerUtility(self.config,
                                      IRedisClientConfiguration)
