@@ -1,3 +1,7 @@
+# 0.1.4
+
+Add `RedisClientConfiguration` class. With it you may configure your client via URL
+or unix_socket_path.
 
 # 0.1.3
 

@@ -15,14 +15,15 @@ and then [include][] the package:
 
 ### Configuration
 
-Requires the following [INI setting / environment variable][]:
+Requires one of the the following [INI setting / environment variable][]:
 
 * `redis.url` / `REDIS_URL`
+* `redis.unix_socket_path` / `REDIS_SOCKET`
 
 Plus optionally looks for:
 
 * `redis.db` / `REDIS_DB`
-* `redis.max_connections` / `REDIS_MAX_CONNECTIONS`
+* `redis.max_connections` / `REDIS_MAX_CONNECTIONS` (only, if configured with URL)
 
 [pyramid_redis]: https://github.com/thruflo/pyramid_redis
 [redis-py]: https://github.com/andymccurdy/redis-py
