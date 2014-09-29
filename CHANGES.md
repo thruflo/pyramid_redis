@@ -1,13 +1,11 @@
 # 0.1.4
 
-Add `RedisClientConfiguration` class. With it you may configure your client via URL
-or unix_socket_path.
+Add `RedisClientConfiguration` class. With it you may configure your client via URL or unix_socket_path.
 
 # 0.1.3
 
-Add `turnstile` module providing a special case `turnstile_client_factory`, which
-can be used as a drop in `turnstile.redis_client` entrypoint with the [turnstile]()
-rate limiting middleware.
+Add `turnstile` module providing a special case `turnstile_client_factory`, which can be used as a drop in `turnstile.redis_client` entrypoint with the
+[turnstile]() rate limiting middleware.
 
 [turnstile]: https://github.com/klmitch/turnstile
 
